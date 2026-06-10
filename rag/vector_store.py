@@ -10,14 +10,15 @@ class SentenceTransformerEmbeddings(Embeddings):
     """
 
     def __init__(self, model):
-        self.model = model
+        self.st_model = model
+        self.model = "all-MiniLM-L6-v2"
 
     def embed_documents(self, texts):
-        vectors = self.model.encode(texts, convert_to_numpy=True)
+        vectors = self.st_model.encode(texts, convert_to_numpy=True)
         return vectors.tolist()
 
     def embed_query(self, text):
-        vector = self.model.encode([text], convert_to_numpy=True)[0]
+        vector = self.st_model.encode([text], convert_to_numpy=True)[0]
         return vector.tolist()
 
 
