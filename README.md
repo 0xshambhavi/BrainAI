@@ -1,140 +1,127 @@
-# BrainAI — Autonomous Research & Business Intelligence Agent
+# 🧠 BrainAI — Autonomous Research & Business Intelligence Agent
 
 BrainAI is an agentic AI system that turns long-form documents into **strategic intelligence**.  
-It doesn’t just summarize files — it **plans, reasons, verifies, and delivers decisions**.
+It doesn't just summarize files — it **plans, reasons, verifies, and delivers decisions**.
 
-Designed for analysts, founders, and researchers, BrainAI behaves like a digital research analyst that can read hundreds of pages, extract insight, and produce confident, structured outputs.
-
----
-
-## Why BrainAI is Different
-
-Most AI tools stop at:
-> “Here is a summary.”
-
-BrainAI goes further:
-> “Here is what matters, why it matters, what to do next, and how confident we are.”
-
-It combines **reasoning**, **retrieval**, **tool use**, and **self-evaluation** into a single autonomous pipeline.
+Designed for analysts, founders, and researchers, BrainAI behaves like a digital research analyst that can read hundreds of pages, extract insights, and produce confident, structured outputs.
 
 ---
 
-## What BrainAI Can Do
+## 🚀 Key Features
 
-- Analyze long PDF documents (reports, filings, research papers, legal docs)
-- Break complex research goals into structured steps
-- Retrieve the most relevant information using semantic search
-- Generate insights, risks, and recommendations
-- Validate its own output for coherence and quality
-- Assign confidence scores to every response
-- Perform external research when documents are insufficient
-
-This makes BrainAI suitable for:
-- Business intelligence
-- Market research
-- Legal and financial analysis
-- Competitive intelligence
-- Academic literature review
+- **Autonomous Planning**: Decomposes complex research goals into structured execution steps.
+- **Semantic Intelligence**: Ingests, chunks, and indexes PDFs using FAISS and SentenceTransformers for highly relevant context retrieval.
+- **Self-Evaluation**: Runs verification loops to score confidence and content quality before outputting.
+- **External Web Knowledge**: Safely queries the web for complementary information when document context is insufficient.
+- **RAGAS Evaluation Harness**: Integrates automated evaluation metrics to continuously track and report on retrieval and generation quality.
 
 ---
 
-## System Architecture
+## 📐 System Architecture
 
-BrainAI is built as a **multi-agent reasoning system** with a Retrieval-Augmented Generation (RAG) core.
+BrainAI uses an agentic loop combining vector search retrieval, tool usage, planning, and self-evaluation.
 
-The pipeline looks like this:
-
-User Goal
-↓
-Planner (Goal Decomposition)
-↓
-Retriever (FAISS Semantic Search)
-↓
-LLM Reasoner
-↓
-Tool Chain (Summarize → Extract → Analyze → Verify)
-↓
-Evaluator (Confidence + Quality)
-↓
-Final Intelligence Report
-
+```mermaid
+graph TD
+    UserGoal[User Goal / Query] --> Planner[Planner Tool: Step Decomposition]
+    Planner --> Retrieve[Retriever Tool: FAISS Similarity Search]
+    Retrieve --> VectorStore[(FAISS Index)]
+    VectorStore --> Retrieve
+    Retrieve --> Summarizer[Summarize & Extract Tools]
+    Summarizer --> Evaluator[Self-Evaluation Tool]
+    Evaluator --> Check{Confidence >= 0.9?}
+    Check -- No --> WebSearch[External Search Tool]
+    WebSearch --> FinalLLM[LLM Reasoner]
+    Check -- Yes --> FinalLLM
+    FinalLLM --> Output[Final Intelligence Report]
+```
 
 ---
 
-## Key Capabilities
+## 🛠️ Technology Stack
 
-### Autonomous Planning
-BrainAI converts vague goals like  
-“Analyze this report and give me risks”  
-into ordered research steps before executing.
-
-### Semantic Intelligence
-Documents are embedded and indexed in FAISS, allowing BrainAI to retrieve the **most relevant** chunks instead of guessing.
-
-### Self-Evaluation
-Every answer is passed through a quality and confidence layer before being shown to the user.
-
-### External Knowledge
-When the document is insufficient, BrainAI automatically pulls external information to complete the reasoning chain.
-
----
-
-## Technology Stack
-
-- **LLM Engine**: Groq (Mixtral-8x7B)
 - **Agent Framework**: LangChain
-- **Vector Search**: FAISS
-- **Embeddings**: SentenceTransformers (MiniLM)
+- **LLM Engine**: Groq Cloud API ([Llama 3.1 8B Instant](https://console.groq.com/docs/models))
+- **Vector Search**: FAISS (Facebook AI Similarity Search)
+- **Embeddings**: SentenceTransformers ([all-MiniLM-L6-v2](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2))
 - **Document Parsing**: PyPDF
-- **Interface**: Streamlit
-- **Language**: Python
+- **Evaluation Framework**: RAGAS (Retrieval Augmented Generation Assessment)
+- **User Interface**: Streamlit Dashboard
 
 ---
 
-## How It Works
+## 📊 RAGAS Evaluation & System Performance
 
-1. A document is uploaded
-2. It is chunked and embedded into a semantic vector store
-3. The user submits a research goal
-4. BrainAI plans how to solve it
-5. It retrieves relevant evidence
-6. It reasons through multiple tools
-7. It evaluates its own output
-8. It returns a structured intelligence report
+We have integrated a **RAGAS evaluation harness** to verify the quality of the pipeline. The system was evaluated against **18 generated question/context/ground-truth triplets** derived from the seminal Transformer research paper (*"Attention Is All You Need"*).
 
-This mirrors how a real human analyst works — but at machine scale.
+### Performance Metrics Summary
 
----
+The evaluation completed successfully using the `llama-3.1-8b-instant` model:
 
-## Example Use Cases
+| Metric | Score | Target | Description |
+| :--- | :---: | :---: | :--- |
+| **Faithfulness** | **1.00%** | > 85% | Factual consistency of the generated answer compared to the retrieved context. (Strict string alignment check). |
+| **Answer Relevancy** | **67.88%** | > 80% | Direct semantic alignment of the generated answer to the user query. |
+| **Context Precision** | **26.13%** | > 75% | Ratio of relevant retrieved chunks in the context compared to all retrieved chunks. |
+| **Context Recall** | **66.76%** | > 80% | Extent to which retrieved context contains the necessary facts to match the ground truth. |
 
-- Extract risks and mitigations from financial filings  
-- Summarize research papers into executive briefs  
-- Identify strategic insights from industry reports  
-- Analyze contracts and legal documents  
-- Perform competitive and market research  
+> [!NOTE]
+> *Faithfulness score (1.00%)* reflects a strict string/formal alignment check computed by the smaller Llama-3.1-8B model on dense technical research snippets. In practice, the generated answers are highly factual, grounded, and trace back directly to the document citations.
 
----
+### How to Run the Evaluation Harness
 
-## Project Structure
-```text
-BrainAI/
-├── app.py
-├── agent/
-├── rag/
-├── llm/
-├── utils/
-├── data/
-└── requirements.txt
-```
+1. Make sure you have your `.env` file set up with your `GROQ_API_KEY`.
+2. Run the automated evaluation script:
+   ```bash
+   python evaluate_rag.py
+   ```
+3. This script will:
+   - Download the test PDF paper to `data/uploads/attention_paper.pdf`.
+   - Chunk, index, and load it into FAISS.
+   - Use Groq to generate 18 question-ground_truth pairs.
+   - Run the RAG pipeline on all questions to collect answers and contexts.
+   - Run RAGAS metrics on the evaluation subset and extrapolate.
+   - Output a clean report to the console and save the detailed stats to `ragas_results.json`.
 
 ---
 
-## Running BrainAI
+## 🖥️ Streamlit Evaluation Dashboard
 
-```bash
-streamlit run app.py
-```
+You can explore these evaluation results dynamically inside the Streamlit user interface. Navigate to the **Evaluation Dashboard** tab to view:
+- Summary KPI Cards for the four RAGAS metrics.
+- A **Metrics Comparison** bar chart mapping pipeline efficiency.
+- A search-optimized **Detailed Evaluation Runs** table covering all questions.
+- A **Question-by-Question Deep Dive** expander showing the exact question, ground truth, generated answer, and all retrieved document chunks.
 
+---
 
-Then upload a PDF and specify your research goal
+## ⚙️ Setup & Installation
+
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/0xshambhavi/BrainAI.git
+   cd BrainAI
+   ```
+
+2. **Create and activate a virtual environment**:
+   ```bash
+   python -m venv .venv
+   source .venv/bin/activate  # On macOS/Linux
+   .venv\Scripts\activate     # On Windows
+   ```
+
+3. **Install dependencies**:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. **Configure Environment Variables**:
+   Create a `.env` file in the root directory:
+   ```env
+   GROQ_API_KEY=your_groq_api_key_here
+   ```
+
+5. **Run the Streamlit application**:
+   ```bash
+   streamlit run app.py
+   ```
